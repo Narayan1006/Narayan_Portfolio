@@ -342,7 +342,7 @@ export default function StoryMode() {
           className="text-center space-y-6 w-full max-w-7xl"
         >
           <h1
-            className="text-[16vw] md:text-[14vw] lg:text-[12vw] font-bold uppercase leading-none tracking-tighter text-foreground"
+            className="whitespace-nowrap text-[12vw] sm:text-[10vw] md:text-[8.5vw] lg:text-[7.5vw] font-bold uppercase leading-none tracking-tighter text-foreground"
             style={{ fontFamily: 'var(--font-heading)' }}
           >
             <ScatterText text={PERSONAL.name} />
@@ -536,7 +536,7 @@ export default function StoryMode() {
           <div className="pt-24 pb-12 flex justify-center border-t border-border mt-24">
             <button
               onClick={() => setIsTerminalOpen(true)}
-              className="label-mono text-muted/40 hover:text-foreground transition-all duration-500 tracking-[0.3em] border border-transparent hover:border-border px-8 py-4 hover:bg-white/5"
+              className="label-mono text-accent hover:text-[#0b0b0e] hover:bg-accent transition-all duration-500 tracking-[0.3em] border border-accent/50 px-8 py-4 shadow-[0_0_20px_rgba(217,164,92,0.15)] hover:shadow-[0_0_40px_rgba(217,164,92,0.6)] bg-black/40 backdrop-blur-sm"
             >
               [ DECODE THE JOURNEY ]
             </button>
