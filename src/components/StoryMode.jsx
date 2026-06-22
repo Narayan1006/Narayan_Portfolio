@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion'
 import { PERSONAL, PROJECTS, SKILL_ZONES, EXPERIENCE, EDUCATION } from '../lib/data'
+import DecodeTerminal from './DecodeTerminal'
 
 const CHAPTERS = [
   { id: 'c1', num: 'I', name: 'THE WALLS' },
@@ -303,6 +304,7 @@ function ScatterText({ text, className, style }) {
 }
 
 export default function StoryMode() {
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false)
   const [activeChapter, setActiveChapter] = useState('c1')
   const refs = useRef({})
 
@@ -531,8 +533,20 @@ export default function StoryMode() {
             <p className="label-mono text-muted/30 text-[8px]">© 2025 Narayan Singh</p>
             <p className="label-mono text-muted/30 text-[8px]">The Journey</p>
           </div>
+          <div className="pt-24 pb-12 flex justify-center border-t border-border mt-24">
+            <button
+              onClick={() => setIsTerminalOpen(true)}
+              className="label-mono text-muted/40 hover:text-foreground transition-all duration-500 tracking-[0.3em] border border-transparent hover:border-border px-8 py-4 hover:bg-white/5"
+            >
+              [ DECODE THE JOURNEY ]
+            </button>
+          </div>
         </div>
       </section>
+
+      <AnimatePresence>
+        {isTerminalOpen && <DecodeTerminal onClose={() => setIsTerminalOpen(false)} />}
+      </AnimatePresence>
     </div>
   )
 }
