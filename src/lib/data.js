@@ -14,7 +14,7 @@ export const PERSONAL = {
   bio: 'Backend Engineer and AI Builder specializing in Java systems, RAG architectures, and offline-first AI platforms. B.Tech CSE at ABES Engineering College. Currently a Java Developer Intern.',
   location: 'Ghaziabad, Uttar Pradesh, India',
   availability: 'Open to Opportunities',
-  openTo: 'Full-time · Remote',
+  openTo: 'Remote',
   email: 'singhnarayan0866@gmail.com',
   linkedin: 'https://www.linkedin.com/in/singhnarayan',
   github: 'https://github.com/Narayan1006',
