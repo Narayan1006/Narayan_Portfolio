@@ -2,6 +2,9 @@
 
 A high-fidelity, cinematic portfolio and resume experience built for modern web browsers. The site is designed not as a static page, but as a dual-mode narrative journey.
 
+**🌐 Live Deployment:** [https://narayan-portfolio-zv2k.vercel.app/](https://narayan-portfolio-zv2k.vercel.app/)
+
+
 ## Features
 
 - **Dual-Mode Architecture:**
