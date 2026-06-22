@@ -107,7 +107,7 @@ export default function DecodeTerminal({ onClose }) {
     
     if (!trimmed) return
 
-    const newHistory = [...history, { type: 'input', text: \`guest@narayan-os:~$ \${cmd}\` }]
+    const newHistory = [...history, { type: 'input', text: `guest@narayan-os:~$ ${cmd}` }]
 
     if (trimmed === 'clear') {
       setHistory([])
@@ -131,7 +131,7 @@ export default function DecodeTerminal({ onClose }) {
         document.body.removeChild(a)
       }
     } else {
-      newHistory.push({ type: 'error', text: \`Command not found: \${trimmed}. Type 'help' for available commands.\` })
+      newHistory.push({ type: 'error', text: `Command not found: ${trimmed}. Type 'help' for available commands.` })
     }
 
     setHistory(newHistory)
