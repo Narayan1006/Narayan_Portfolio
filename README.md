@@ -44,15 +44,6 @@ A high-fidelity, cinematic portfolio and resume experience built for modern web 
 - `src/components/`: Contains the UI building blocks (`StoryMode.jsx`, `SystemMode.jsx`, `DecodeTerminal.jsx`, etc.)
 - `src/index.css`: Contains all the core theme variables (colors, typography).
 - `public/`: Static assets, including the downloadable resume PDF.
-- `vercel.json`: Pre-configured for seamless Vercel deployment and client-side routing.
-
-## Deployment (Vercel)
-
-This project is fully optimized for [Vercel](https://vercel.com).
-1. Push your code to GitHub.
-2. Go to Vercel and import your repository.
-3. Vercel will automatically detect it as a **Vite** project.
-4. Click **Deploy**. The `vercel.json` file ensures proper routing out-of-the-box.
 
 ## Author
 
