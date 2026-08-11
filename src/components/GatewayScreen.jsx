@@ -49,13 +49,23 @@ export default function GatewayScreen({ onNavigate }) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,#F5F2EA_0%,#EBE7DF_60%,#DDD8CD_100%)] pointer-events-none z-0" />
       <div className="absolute top-1/6 right-1/4 w-[600px] h-[600px] bg-[#FFFFFF]/40 rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {/* 3D CANVAS */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
+      {/* 3D CANVAS — desktop only */}
+      <div className="hidden md:block absolute inset-0 z-10 pointer-events-none">
         <Suspense fallback={null}>
           <CinematicCanvas
             onModelLoaded={handleModelLoaded}
           />
         </Suspense>
+      </div>
+
+      {/* MOBILE FALLBACK IMAGE — shown only on < md */}
+      <div className="md:hidden absolute inset-0 z-10 pointer-events-none flex items-end justify-center">
+        <img
+          src="/model_fallback.png"
+          alt="Narayan Singh"
+          className="h-[75vh] w-auto object-contain object-bottom select-none"
+          draggable="false"
+        />
       </div>
 
       {/* LOADING OVERLAY */}
@@ -83,8 +93,11 @@ export default function GatewayScreen({ onNavigate }) {
                   transition={{ duration: 1.2, ease: 'easeInOut' }}
                 />
               </div>
-              <p className="label-mono text-[#7A7468] text-[9px] tracking-[0.25em]">
+              <p className="label-mono text-[#7A7468] text-[9px] tracking-[0.25em] hidden md:block">
                 LOADING 3D ASSETS...
+              </p>
+              <p className="label-mono text-[#7A7468] text-[9px] tracking-[0.25em] md:hidden">
+                WELCOME
               </p>
             </div>
           </motion.div>

@@ -15,7 +15,9 @@ const TARGET_ROT_X = -0.28
 export default function ExplorePage({ onNavigateBack }) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [mobileBg, setMobileBg] = useState('#EBE7DF')
   const scrollContainerRef = useRef(null)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   // Master animated 3D story state ref (read by Three.js useFrame every frame)
   const storyStateRef = useRef({
@@ -54,6 +56,9 @@ export default function ExplorePage({ onNavigateBack }) {
               }
             }
             setActiveChapterIndex(currIdx)
+
+            // On mobile: sync background color via React state (no canvas)
+            if (isMobile) setMobileBg(storyStateRef.current.bgColor)
           },
         },
       })
@@ -108,10 +113,26 @@ export default function ExplorePage({ onNavigateBack }) {
   }, [])
 
   return (
-    <div className="relative bg-[#0D0B09] text-[#F0EDE8] font-['Inter'] selection:bg-[#6B9A55] selection:text-white">
+    <div
+      className="relative text-[#F0EDE8] font-['Inter'] selection:bg-[#6B9A55] selection:text-white"
+      style={isMobile ? { backgroundColor: mobileBg, transition: 'background-color 0.4s ease' } : { backgroundColor: '#0D0B09' }}
+    >
       
-      {/* PERSISTENT 3D CANVAS */}
-      <StoryCanvas storyStateRef={storyStateRef} />
+      {/* PERSISTENT 3D CANVAS — desktop only */}
+      <div className="hidden md:block">
+        <StoryCanvas storyStateRef={storyStateRef} />
+      </div>
+
+      {/* MOBILE FALLBACK — fixed character image, fades with scroll darkness */}
+      <div className="md:hidden fixed inset-0 z-0 pointer-events-none flex items-end justify-end pr-0">
+        <img
+          src="/model_fallback.png"
+          alt=""
+          draggable="false"
+          className="h-[65vh] w-auto object-contain object-bottom opacity-30 select-none"
+          style={{ filter: 'brightness(0.7)' }}
+        />
+      </div>
 
       {/* PERSISTENT STORY STRIP HEADER */}
       <StoryStrip
