@@ -24,15 +24,15 @@ export default function StoryChapters({ onNavigateBack }) {
           <span className="label-mono text-xs text-[#4A7A3A] tracking-[0.3em] font-bold">
             01 / STORY MODE
           </span>
-          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black italic tracking-tight text-[#1A1612] font-['Space_Grotesk'] leading-none">
+          <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black italic tracking-tight text-[#F0EDE8] md:text-[#1A1612] font-['Space_Grotesk'] leading-none">
             SO, YOU FOUND ME.
           </h1>
-          <p className="label-mono text-lg sm:text-xl text-[#5A5448] tracking-[0.25em] font-bold">
+          <p className="label-mono text-lg sm:text-xl text-[#F0EDE8] md:text-[#5A5448] tracking-[0.25em] font-bold">
             NARAYAN SINGH — <span className="text-[#4A7A3A]">AI · SOFTWARE · BUILDING</span>
           </p>
           <div className="pt-8 flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-[#4A7A3A] animate-ping" />
-            <span className="label-mono text-xs text-[#5A5448] tracking-widest font-bold">
+            <span className="label-mono text-xs text-[#8E929B] md:text-[#5A5448] tracking-widest font-bold">
               SCROLL DOWN TO BEGIN JOURNEY ↓
             </span>
           </div>

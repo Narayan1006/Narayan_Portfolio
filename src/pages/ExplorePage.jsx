@@ -15,7 +15,7 @@ const TARGET_ROT_X = -0.28
 export default function ExplorePage({ onNavigateBack }) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
-  const [mobileBg, setMobileBg] = useState('#EBE7DF')
+  const [mobileBg, setMobileBg] = useState('#121418')
   const scrollContainerRef = useRef(null)
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
@@ -89,24 +89,27 @@ export default function ExplorePage({ onNavigateBack }) {
       tl.to(state, { modelPosX: 0.2, modelRotY: TARGET_ROT_Y, cameraZ: 7.0, bgColor: '#040404', duration: 2.5 }, 22.5)
 
       // Animate text reveal triggers for story-reveal elements
-      const reveals = gsap.utils.toArray('.story-reveal')
-      reveals.forEach((el) => {
-        gsap.fromTo(
-          el,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            scrollTrigger: {
-              trigger: el,
-              start: 'top 85%',
-              end: 'top 35%',
-              scrub: 0.5,
-            },
-          }
-        )
-      })
+      // On mobile: skip the opacity-0 start so text is immediately visible
+      if (!isMobile) {
+        const reveals = gsap.utils.toArray('.story-reveal')
+        reveals.forEach((el) => {
+          gsap.fromTo(
+            el,
+            { opacity: 0, y: 30 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              scrollTrigger: {
+                trigger: el,
+                start: 'top 85%',
+                end: 'top 35%',
+                scrub: 0.5,
+              },
+            }
+          )
+        })
+      }
     }, scrollContainerRef)
 
     return () => ctx.revert()
