@@ -45,21 +45,19 @@ export default function ProjectsSection() {
                   {proj.tagline}
                 </p>
 
-                <p className="text-xs sm:text-sm text-[#5A5448] leading-relaxed">
-                  {proj.description || '[PLACEHOLDER: Detailed project problem & solution explanation]'}
-                </p>
+                {proj.description && (
+                  <p className="text-xs sm:text-sm text-[#5A5448] leading-relaxed">
+                    {proj.description}
+                  </p>
+                )}
 
                 {/* HIGHLIGHT BULLETS */}
-                {proj.highlights && proj.highlights.length > 0 ? (
+                {proj.highlights && proj.highlights.length > 0 && (
                   <ul className="space-y-1.5 text-xs text-[#5A5448] list-disc list-inside pt-2">
                     {proj.highlights.map((h, i) => (
                       <li key={i}>{h}</li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="text-xs text-[#9E9689] italic pt-1">
-                    [PLACEHOLDER: Bullet points highlighting key technical accomplishments]
-                  </p>
                 )}
 
                 {/* TECH STACK CHIPS */}
@@ -76,7 +74,7 @@ export default function ProjectsSection() {
 
                 {/* LINKS */}
                 <div className="flex items-center gap-4 pt-4">
-                  {proj.github ? (
+                  {proj.github && (
                     <a
                       href={proj.github}
                       target="_blank"
@@ -85,10 +83,6 @@ export default function ProjectsSection() {
                     >
                       GITHUB REPO →
                     </a>
-                  ) : (
-                    <span className="label-mono text-[10px] text-[#A6A092]">
-                      [PLACEHOLDER: GITHUB REPO URL]
-                    </span>
                   )}
 
                   {proj.live && (
