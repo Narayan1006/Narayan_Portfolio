@@ -100,7 +100,7 @@ export const PROJECTS = [
       'HIRE / REVIEW / REJECT',
     ],
     github: 'https://github.com/Narayan1006/VireHire',
-    live: null,
+    live: 'https://virehire-cdd94.web.app',
     category: 'AI Engineering',
   },
   {
