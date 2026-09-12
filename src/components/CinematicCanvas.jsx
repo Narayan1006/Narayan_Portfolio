@@ -1,172 +1,140 @@
-import { useRef, useEffect } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
-import * as THREE from 'three'
+import { useRef, useEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
-// Final resting angle (profile view, looking up-right)
-const TARGET_ROT_Y = Math.PI + 0.55
-const TARGET_ROT_X = -0.28
-// Entrance start angle (facing away, will spin to front)
-const ENTER_ROT_Y = TARGET_ROT_Y - Math.PI * 0.75
-const ENTRANCE_DURATION = 2.0 // seconds
+// Final resting angle: model on RIGHT looks INWARD toward the left content & cards
+const TARGET_ROT_Y = Math.PI + 0.08; // Turned inward toward center/left
+const TARGET_ROT_X = -0.04;          // Chin leveled naturally
+const ENTER_ROT_Y  = TARGET_ROT_Y - 0.5; // Smooth cinematic entrance
+const ENTRANCE_DURATION = 1.8;
 
-function ModelMesh({ onModelLoaded }) {
-  const { scene } = useGLTF('/model.glb')
-  const groupRef = useRef()
-  const { camera } = useThree()
-  const initialized = useRef(false)
-  const entranceStart = useRef(null)
+function SculptureMesh({ onModelLoaded }) {
+  const { scene } = useGLTF("/model.glb");
+  const modelRef = useRef();
+  const { camera } = useThree();
 
+  const initialized = useRef(false);
+  const baseScale = useRef(1);
+  const modelOffset = useRef(new THREE.Vector3());
+  const entranceStart = useRef(null);
+
+  // Setup bounding box, centering offset, and scale
   useEffect(() => {
-    if (!scene || !groupRef.current || initialized.current) return
+    if (!scene || !modelRef.current || initialized.current) return;
 
-    // Disable frustum culling
     scene.traverse((child) => {
-      if (child.isMesh) child.frustumCulled = false
-    })
+      if (child.isMesh) {
+        child.frustumCulled = false;
+        if (child.material) {
+          child.material.roughness = Math.max(child.material.roughness || 0.4, 0.35);
+          child.material.metalness = Math.min(child.material.metalness || 0.1, 0.25);
+        }
+      }
+    });
 
-    // Compute bounding box and auto-scale/position
-    const box = new THREE.Box3().setFromObject(scene)
-    const size = new THREE.Vector3()
-    const center = new THREE.Vector3()
-    box.getSize(size)
-    box.getCenter(center)
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
 
-    const maxDim = Math.max(size.x, size.y, size.z)
-    const fovRad = (camera.fov * Math.PI) / 180
-    const dist = camera.position.z
-    const frustumHeight = 2 * dist * Math.tan(fovRad / 2)
-    const frustumWidth = frustumHeight * camera.aspect
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fovRad = (camera.fov * Math.PI) / 180;
+    const dist = camera.position.z;
+    const frustumH = 2 * dist * Math.tan(fovRad / 2);
+    const frustumW = frustumH * camera.aspect;
 
-    // Scale: fill ~135% of frustum height so model is large and naturally crops below waist
-    const scale = (frustumHeight * 1.35) / maxDim
-    groupRef.current.scale.setScalar(scale)
+    // Scale so bust dominates ~55-60% of right viewport
+    const scale = (frustumH * 0.95) / maxDim;
+    baseScale.current = scale;
 
-    // Position right of centre, head in upper half
-    groupRef.current.position.set(
-      -center.x * scale + frustumWidth * 0.20,
-      -center.y * scale - frustumHeight * 0.08,
-      0
-    )
+    // Center geometry inside local group
+    modelOffset.current.set(-center.x, -center.y, -center.z);
 
-    // Set entrance start rotation — back of head facing camera
-    groupRef.current.rotation.set(TARGET_ROT_X, ENTER_ROT_Y, 0)
+    // Position on right half of the hero screen
+    modelRef.current.position.set(frustumW * 0.18, -frustumH * 0.08, 0);
+    modelRef.current.scale.setScalar(scale);
+    modelRef.current.rotation.set(TARGET_ROT_X, ENTER_ROT_Y, 0);
 
-    initialized.current = true
-    if (onModelLoaded) onModelLoaded()
-  }, [scene, camera, onModelLoaded])
+    initialized.current = true;
+    if (onModelLoaded) onModelLoaded();
+  }, [scene, camera, onModelLoaded]);
 
   useFrame((state) => {
-    if (!groupRef.current) return
+    if (!modelRef.current || !initialized.current) return;
+    const now = state.clock.getElapsedTime();
 
-    const now = state.clock.getElapsedTime()
-
-    // Record when animation actually starts (after model ready)
-    if (entranceStart.current === null && initialized.current) {
-      entranceStart.current = now
+    if (entranceStart.current === null) {
+      entranceStart.current = now;
     }
-    if (entranceStart.current === null) return
 
-    const elapsed = now - entranceStart.current
-    const t = Math.min(elapsed / ENTRANCE_DURATION, 1)
+    const elapsed = now - entranceStart.current;
+    const t = Math.min(elapsed / ENTRANCE_DURATION, 1);
 
     if (t < 1) {
-      // Entrance: ease-out cubic spin into final pose
-      const eased = 1 - Math.pow(1 - t, 3)
-      groupRef.current.rotation.y = ENTER_ROT_Y + (TARGET_ROT_Y - ENTER_ROT_Y) * eased
-      groupRef.current.rotation.x = TARGET_ROT_X
-    } else {
-      // Settled: gentle left-right rotation sway
-      const swayY = Math.sin(now * 0.7) * 0.04
-      const swayX = Math.cos(now * 0.5) * 0.015
-      groupRef.current.rotation.y = THREE.MathUtils.lerp(
-        groupRef.current.rotation.y, TARGET_ROT_Y + swayY, 0.05
-      )
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(
-        groupRef.current.rotation.x, TARGET_ROT_X + swayX, 0.05
-      )
+      // Smooth entrance spin
+      const eased = 1 - Math.pow(1 - t, 3);
+      modelRef.current.rotation.y = ENTER_ROT_Y + (TARGET_ROT_Y - ENTER_ROT_Y) * eased;
+      modelRef.current.rotation.x = TARGET_ROT_X;
+      return;
     }
-  })
+
+    // Additive subtle idle floating & gentle sway
+    const idleY = Math.sin(now * 0.6) * 0.035;
+    const idleRotY = Math.sin(now * 0.45) * 0.02;
+    const idleRotX = Math.cos(now * 0.5) * 0.01;
+
+    // Micro cursor parallax
+    const mx = state.pointer.x;
+    const my = state.pointer.y;
+
+    const targetRotY = TARGET_ROT_Y + idleRotY + mx * 0.35;
+    const targetRotX = TARGET_ROT_X + idleRotX - my * 0.12;
+
+    modelRef.current.rotation.y = THREE.MathUtils.lerp(modelRef.current.rotation.y, targetRotY, 0.06);
+    modelRef.current.rotation.x = THREE.MathUtils.lerp(modelRef.current.rotation.x, targetRotX, 0.06);
+    modelRef.current.position.y = THREE.MathUtils.lerp(
+      modelRef.current.position.y,
+      -0.08 + idleY + my * 0.05,
+      0.06
+    );
+  });
 
   return (
-    <group ref={groupRef}>
-      <primitive object={scene} />
+    <group ref={modelRef}>
+      <group position={[modelOffset.current.x, modelOffset.current.y, modelOffset.current.z]}>
+        <primitive object={scene} />
+      </group>
     </group>
-  )
-}
-
-// Floating leaf particles
-function Particles({ count = 22 }) {
-  const ref = useRef()
-  const data = useRef(null)
-
-  if (!data.current) {
-    const pos = new Float32Array(count * 3)
-    const spd = new Float32Array(count)
-    for (let i = 0; i < count; i++) {
-      pos[i * 3]     = (Math.random() - 0.5) * 12
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 8
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 4
-      spd[i] = 0.12 + Math.random() * 0.28
-    }
-    data.current = { pos, spd }
-  }
-
-  useFrame((state, delta) => {
-    if (!ref.current) return
-    const pa = ref.current.geometry.attributes.position
-    const t = state.clock.getElapsedTime()
-    for (let i = 0; i < count; i++) {
-      let y = pa.getY(i) - data.current.spd[i] * delta * 0.55
-      let x = pa.getX(i) + Math.sin(t * data.current.spd[i] + i) * delta * 0.35
-      if (y < -4) { y = 4; x = (Math.random() - 0.5) * 12 }
-      pa.setY(i, y)
-      pa.setX(i, x)
-    }
-    pa.needsUpdate = true
-  })
-
-  return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={data.current.pos}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial size={0.11} color="#4A7A3A" transparent opacity={0.72} sizeAttenuation />
-    </points>
-  )
+  );
 }
 
 function Lights() {
   return (
     <>
       <ambientLight intensity={2.6} color="#F0EDE6" />
-      <directionalLight position={[-3, 6, 5]}  intensity={5.5} color="#FFFDF8" castShadow />
-      <directionalLight position={[5, 2, -3]}  intensity={3.0} color="#C8C2B6" />
-      <pointLight      position={[0, -3, 3]}   intensity={2.0} color="#4A7A3A" />
+      <directionalLight position={[-3, 6, 5]} intensity={5.2} color="#FFFDF8" castShadow />
+      <directionalLight position={[5, 2, -3]} intensity={2.8} color="#C8C2B6" />
+      <pointLight position={[0, -2, 3]} intensity={2.2} color="#4A7A3A" />
     </>
-  )
+  );
 }
 
 export default function CinematicCanvas({ onModelLoaded }) {
   return (
-    <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+    <div style={{ width: "100%", height: "100%", position: "absolute", inset: 0, pointerEvents: "none" }}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 42, near: 0.01, far: 2000 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 2]}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: "100%", height: "100%" }}
       >
         <Lights />
-        <Particles count={22} />
-        <ModelMesh onModelLoaded={onModelLoaded} />
+        <SculptureMesh onModelLoaded={onModelLoaded} />
       </Canvas>
     </div>
-  )
+  );
 }
 
-useGLTF.preload('/model.glb')
+useGLTF.preload("/model.glb");

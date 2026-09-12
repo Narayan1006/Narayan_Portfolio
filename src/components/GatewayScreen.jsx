@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Suspense, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import CinematicCanvas from './CinematicCanvas'
+import ViewCounter from './ViewCounter'
 
 export default function GatewayScreen({ onNavigate }) {
   const [hoverState, setHoverState] = useState(null)
@@ -50,7 +51,7 @@ export default function GatewayScreen({ onNavigate }) {
       <div className="absolute top-1/6 right-1/4 w-[600px] h-[600px] bg-[#FFFFFF]/40 rounded-full blur-[140px] pointer-events-none z-0" />
 
       {/* 3D CANVAS — desktop only */}
-      <div className="hidden md:block absolute inset-0 z-10 pointer-events-none">
+      <div className="hidden md:block absolute inset-0 z-10">
         <Suspense fallback={null}>
           <CinematicCanvas
             onModelLoaded={handleModelLoaded}
@@ -138,12 +139,13 @@ export default function GatewayScreen({ onNavigate }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4 pointer-events-auto">
+          <ViewCounter />
+          <div className="hidden sm:flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-[#4A7A3A]" />
             <span className="label-mono text-[10px] text-[#5A5448] tracking-widest">ONLINE</span>
           </div>
-          <span className="label-mono text-[10px] text-[#7A7468] tracking-widest">
+          <span className="label-mono text-[10px] text-[#7A7468] tracking-widest hidden md:inline">
             01 / ENTRY
           </span>
         </div>
@@ -185,6 +187,23 @@ export default function GatewayScreen({ onNavigate }) {
           </motion.p>
 
           <div className="w-16 h-[2px] bg-[#4A7A3A]/40 pt-1" />
+
+          {/* CURATED PHILOSOPHY QUOTE */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="max-w-md pt-2"
+          >
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFFFF]/75 backdrop-blur-md border border-[#D4CFC4]/70 border-l-4 border-l-[#4A7A3A] shadow-xs space-y-1.5">
+              <p className="text-xs sm:text-sm font-semibold italic text-[#1A1612] font-['Space_Grotesk'] leading-relaxed">
+                “Ideas become architecture. Architecture becomes product. Product becomes impact.”
+              </p>
+              <p className="label-mono text-[9px] text-[#7A7468] tracking-widest font-bold">
+                — CORE PHILOSOPHY
+              </p>
+            </div>
+          </motion.div>
         </div>
 
         {/* CARDS CONTAINER */}
