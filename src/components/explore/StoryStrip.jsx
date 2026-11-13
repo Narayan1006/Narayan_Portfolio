@@ -1,6 +1,13 @@
 import { CHAPTERS } from '../../data/storyData'
 
 export default function StoryStrip({ activeChapterIndex, scrollProgress, onNavigateBack }) {
+  const handleJump = (id) => {
+    const el = document.getElementById(id) || document.querySelector(`[data-section="${id}"]`)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 py-4 px-6 sm:px-12 flex items-center justify-between pointer-events-auto bg-gradient-to-b from-[#0D0B09]/80 to-transparent backdrop-blur-xs">
       
@@ -22,20 +29,25 @@ export default function StoryStrip({ activeChapterIndex, scrollProgress, onNavig
           style={{ width: `calc(${Math.min(100, Math.max(0, scrollProgress * 100))}% * 0.85)` }}
         />
 
-        {/* CHAPTER DOTS & LABELS */}
+        {/* CHAPTER DOTS & LABELS (CLICKABLE JUMP LINKS) */}
         {CHAPTERS.map((ch, idx) => {
           const isActive = idx === activeChapterIndex
           const isPassed = idx < activeChapterIndex
 
           return (
-            <div key={ch.id} className="flex items-center gap-2 relative group">
+            <button
+              key={ch.id}
+              onClick={() => handleJump(ch.id)}
+              className="flex items-center gap-2 relative group cursor-pointer select-none bg-transparent border-none p-0 focus:outline-none"
+              title={`Jump to ${ch.label}`}
+            >
               <span
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 flex items-center justify-center ${
                   isActive
                     ? 'bg-[#6B9A55] ring-4 ring-[#4A7A3A]/30 scale-125'
                     : isPassed
-                    ? 'bg-[#4A7A3A]'
-                    : 'bg-[#1F2228] border border-[#5A5448]'
+                    ? 'bg-[#4A7A3A] group-hover:bg-[#6B9A55]'
+                    : 'bg-[#1F2228] border border-[#5A5448] group-hover:border-[#6B9A55]'
                 }`}
               />
               <span
@@ -43,13 +55,13 @@ export default function StoryStrip({ activeChapterIndex, scrollProgress, onNavig
                   isActive
                     ? 'text-[#F0EDE8] font-bold'
                     : isPassed
-                    ? 'text-[#8E929B]'
-                    : 'text-[#5A5448]'
+                    ? 'text-[#8E929B] group-hover:text-[#F0EDE8]'
+                    : 'text-[#5A5448] group-hover:text-[#8E929B]'
                 }`}
               >
                 {ch.label}
               </span>
-            </div>
+            </button>
           )
         })}
       </div>
@@ -59,7 +71,7 @@ export default function StoryStrip({ activeChapterIndex, scrollProgress, onNavig
         <span className="text-[#6B9A55] font-bold">
           {CHAPTERS[activeChapterIndex]?.number || '01'}
         </span>
-        <span>/ 08</span>
+        <span>/ {String(CHAPTERS.length).padStart(2, '0')}</span>
       </div>
 
     </header>

@@ -3,6 +3,7 @@ import RecruiterHero from '../components/recruiter/RecruiterHero'
 import AtAGlance from '../components/recruiter/AtAGlance'
 import ExperienceSection from '../components/recruiter/ExperienceSection'
 import ProjectsSection from '../components/recruiter/ProjectsSection'
+import DsaSection from '../components/recruiter/DsaSection'
 import SkillsSection from '../components/recruiter/SkillsSection'
 import EducationSection from '../components/recruiter/EducationSection'
 import ContactSection from '../components/recruiter/ContactSection'
@@ -29,13 +30,16 @@ export default function RecruiterPage({ onNavigateBack }) {
         {/* 03 SELECTED PROJECTS SECTION */}
         <ProjectsSection />
 
-        {/* 04 SKILLS & PROBLEM SOLVING */}
+        {/* 04 DSA & COMPETITIVE PROGRAMMING */}
+        <DsaSection />
+
+        {/* 05 SKILLS SECTION */}
         <SkillsSection />
 
-        {/* 05 EDUCATION & CERTIFICATIONS */}
+        {/* 06 EDUCATION & CERTIFICATIONS */}
         <EducationSection />
 
-        {/* 06 CONTACT SECTION */}
+        {/* 07 CONTACT SECTION */}
         <ContactSection />
 
       </main>

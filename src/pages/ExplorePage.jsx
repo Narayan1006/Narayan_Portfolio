@@ -18,12 +18,17 @@ const FACE_RIGHT = PI + 0.95;  // Model on LEFT, turns gracefully towards RIGHT 
 const FACE_LEFT  = PI + 0.15;  // Model on RIGHT, turns gracefully towards LEFT text (~3.29 rad)
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CERTIFICATE SECTION OPACITY — synchronized with Chapter 06
+// CERTIFICATE SECTION OPACITY — dynamically derived from CHAPTERS
 // ═══════════════════════════════════════════════════════════════════════════
-const CERT_IN_START  = 0.66;
-const CERT_IN_END    = 0.72;
-const CERT_FULL_END  = 0.83;
-const CERT_OUT_END   = 0.88;
+const certIdx = CHAPTERS.findIndex((c) => c.id === "certificates");
+const prevCertProgress = certIdx > 0 ? CHAPTERS[certIdx - 1].progress : 0.64;
+const certProgress     = certIdx >= 0 ? CHAPTERS[certIdx].progress : 0.78;
+const nextCertProgress = certIdx >= 0 && certIdx < CHAPTERS.length - 1 ? CHAPTERS[certIdx + 1].progress : 0.90;
+
+const CERT_IN_START  = prevCertProgress + (certProgress - prevCertProgress) * 0.55;
+const CERT_IN_END    = certProgress - 0.04;
+const CERT_FULL_END  = certProgress + (nextCertProgress - certProgress) * 0.45;
+const CERT_OUT_END   = certProgress + (nextCertProgress - certProgress) * 0.85;
 
 function getCertOpacity(prog) {
   if (prog < CERT_IN_START || prog > CERT_OUT_END) return 0;
@@ -62,17 +67,22 @@ const CHAPTER_QUOTES = [
     context: "On Shipping",
   },
   {
-    label: "06 / CREDENTIALS",
+    label: "06 / PRACTICE",
+    quote: "// TODO: Narayan to write",
+    context: "On Practice",
+  },
+  {
+    label: "07 / CREDENTIALS",
     quote: "Every certificate is a commitment —\nnot just to knowledge,\nbut to showing up.",
     context: "On Learning",
   },
   {
-    label: "07 / HORIZON",
+    label: "08 / HORIZON",
     quote: "Always one rabbit hole deeper.\nThat's where the good stuff lives.",
     context: "On Curiosity",
   },
   {
-    label: "08 / FINALE",
+    label: "09 / FINALE",
     quote: "The best project\nis the one we haven't built yet.\n\nLet's fix that.",
     context: "On the Future",
   },
@@ -212,6 +222,13 @@ export default function ExplorePage({ onNavigateBack }) {
       const state = storyStateRef.current;
       const { model, camera, lighting, environment } = state;
 
+      // Initial state of cert track
+      gsap.set(".cert-track-wrapper", {
+        opacity: 0,
+        pointerEvents: "none",
+        visibility: "hidden",
+      });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: scrollContainerRef.current,
@@ -263,29 +280,35 @@ export default function ExplorePage({ onNavigateBack }) {
       tl.to(lighting, { keyColor: "#F8FAFC", fillColor: "#374151", keyIntensity: 5.0, rimIntensity: 2.0, duration: 16 }, 42);
       tl.to(environment, { bgColor: "#2A2C28", duration: 16 }, 42);
 
-      // ━━ 05 PROJECTS → 06 CERTIFICATES (Smooth glide to Center, face Front) ━━
-      tl.to(model,    { posX: 0, posY: 0.22, posZ: 0, rotY: BASE_FRONT, rotX: 0.0, scale: 1.02, duration: 18 }, 58);
-      tl.to(camera,   { posZ: 6.5, duration: 18 }, 58);
+      // ━━ 05 PROJECTS → 06 PRACTICE (Smooth glide Mid-Right, turn toward Left cards) ━━
+      tl.to(model,    { posX: 1.65, posY: -0.10, posZ: 0, rotY: FACE_LEFT, rotX: -0.05, scale: 1.05, duration: 14 }, 58);
+      tl.to(camera,   { posZ: 6.5, duration: 14 }, 58);
+      tl.to(lighting, { keyColor: "#D1FAE5", fillColor: "#1E3A2F", rimColor: "#34D399", keyIntensity: 4.8, fillIntensity: 2.4, rimIntensity: 3.2, duration: 14 }, 58);
+      tl.to(environment, { bgColor: "#181A1D", duration: 14 }, 58);
+
+      // ━━ 06 PRACTICE → 07 CERTIFICATES (Smooth glide to Center, face Front) ━━
+      tl.to(model,    { posX: 0, posY: 0.22, posZ: 0, rotY: BASE_FRONT, rotX: 0.0, scale: 1.02, duration: 14 }, 72);
+      tl.to(camera,   { posZ: 6.5, duration: 14 }, 72);
       tl.to(lighting, {
         keyColor: "#FFF7ED", fillColor: "#854D0E",
-        rimColor: "#F59E0B", rimIntensity: 5.0, keyIntensity: 5.5, duration: 18,
-      }, 58);
-      tl.to(environment, { bgColor: "#0B0C0E", duration: 18 }, 58);
+        rimColor: "#F59E0B", rimIntensity: 5.0, keyIntensity: 5.5, duration: 14,
+      }, 72);
+      tl.to(environment, { bgColor: "#0B0C0E", duration: 14 }, 72);
 
-      // ━━ 06 CERTIFICATES → 07 EXPLORING (Smooth glide Left, subtle turn Right) ━━
-      tl.to(model,    { posX: -1.15, posY: -0.10, posZ: 0, rotY: FACE_RIGHT, rotX: -0.05, scale: 1.12, duration: 12 }, 76);
-      tl.to(camera,   { posZ: 6.5, duration: 12 }, 76);
-      tl.to(lighting, { keyColor: "#E2E8F0", fillColor: "#3B82F6", rimColor: "#10B981", rimIntensity: 2.8, duration: 12 }, 76);
-      tl.to(environment, { bgColor: "#050507", duration: 12 }, 76);
+      // ━━ 07 CERTIFICATES → 08 EXPLORING (Smooth glide Left, subtle turn Right) ━━
+      tl.to(model,    { posX: -1.15, posY: -0.10, posZ: 0, rotY: FACE_RIGHT, rotX: -0.05, scale: 1.12, duration: 12 }, 86);
+      tl.to(camera,   { posZ: 6.5, duration: 12 }, 86);
+      tl.to(lighting, { keyColor: "#E2E8F0", fillColor: "#3B82F6", rimColor: "#10B981", rimIntensity: 2.8, duration: 12 }, 86);
+      tl.to(environment, { bgColor: "#050507", duration: 12 }, 86);
 
-      // ━━ 07 EXPLORING → 08 FINALE (Smooth glide Center, Heroic Front) ━━
-      tl.to(model,    { posX: 0, posY: -0.08, posZ: 0.5, rotY: BASE_FRONT, rotX: -0.05, scale: 1.30, duration: 12 }, 88);
-      tl.to(camera,   { posZ: 5.6, duration: 12 }, 88);
+      // ━━ 08 EXPLORING → 09 FINALE (Smooth glide Center, Heroic Front) ━━
+      tl.to(model,    { posX: 0, posY: -0.08, posZ: 0.5, rotY: BASE_FRONT, rotX: -0.05, scale: 1.30, duration: 12 }, 98);
+      tl.to(camera,   { posZ: 5.6, duration: 12 }, 98);
       tl.to(lighting, {
         keyColor: "#FEF9C3", fillColor: "#65A30D",
         rimColor: "#22C55E", rimIntensity: 4.8, keyIntensity: 5.2, duration: 12,
-      }, 88);
-      tl.to(environment, { bgColor: "#040404", duration: 12 }, 88);
+      }, 98);
+      tl.to(environment, { bgColor: "#040404", duration: 12 }, 98);
 
       // Content reveals (desktop)
       if (!isMobile) {
@@ -336,9 +359,11 @@ export default function ExplorePage({ onNavigateBack }) {
         onNavigateBack={onNavigateBack}
       />
 
-      {/* INTERACTION HINT PILL */}
+      {/* INTERACTION HINT PILL (Fades smoothly past Chapter 01 to prevent content overlap) */}
       <div
-        className="hidden md:flex fixed bottom-6 left-8 z-40 items-center gap-2.5 px-4 py-2 rounded-full bg-[#121418]/85 border border-[#1F2228] backdrop-blur-md pointer-events-auto cursor-pointer hover:border-[#6B9A55] transition-all duration-300 shadow-lg hover:scale-105"
+        className={`hidden md:flex fixed bottom-6 left-8 z-30 items-center gap-2.5 px-4 py-2 rounded-full bg-[#121418]/85 border border-[#1F2228] backdrop-blur-md cursor-pointer hover:border-[#6B9A55] transition-all duration-500 shadow-lg hover:scale-105 ${
+          scrollProgress > 0.08 ? 'opacity-0 pointer-events-none translate-y-3' : 'opacity-100 pointer-events-auto'
+        }`}
         onClick={() => setQuoteVisible((v) => !v)}
         title="Click to reveal philosophy"
       >

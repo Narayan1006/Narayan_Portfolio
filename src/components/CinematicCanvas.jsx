@@ -121,6 +121,17 @@ function Lights() {
   );
 }
 
+function RendererDisposer() {
+  const { gl } = useThree();
+  useEffect(() => {
+    return () => {
+      gl.dispose();
+      gl.forceContextLoss();
+    };
+  }, [gl]);
+  return null;
+}
+
 export default function CinematicCanvas({ onModelLoaded }) {
   return (
     <div style={{ width: "100%", height: "100%", position: "absolute", inset: 0, pointerEvents: "none" }}>
@@ -130,6 +141,7 @@ export default function CinematicCanvas({ onModelLoaded }) {
         dpr={[1, 2]}
         style={{ width: "100%", height: "100%" }}
       >
+        <RendererDisposer />
         <Lights />
         <SculptureMesh onModelLoaded={onModelLoaded} />
       </Canvas>

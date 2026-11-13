@@ -6,7 +6,7 @@ export default function EducationSection() {
       
       {/* SECTION HEADER */}
       <div className="flex items-center gap-3 mb-10">
-        <span className="label-mono text-xs text-[#4A7A3A] font-bold">05 /</span>
+        <span className="label-mono text-xs text-[#4A7A3A] font-bold">06 /</span>
         <h2 className="text-2xl sm:text-3xl font-bold uppercase tracking-wider text-[#1A1612] font-['Space_Grotesk']">
           EDUCATION, CERTIFICATIONS & ACHIEVEMENTS
         </h2>

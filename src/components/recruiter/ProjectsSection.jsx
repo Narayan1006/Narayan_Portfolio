@@ -99,19 +99,19 @@ export default function ProjectsSection() {
               </div>
 
               {/* RIGHT ARCHITECTURE FLOW OR PREVIEW (IF AVAILABLE) */}
-              {proj.architecture && (
+              {proj.pipeline && proj.pipeline.length > 0 && (
                 <div className="lg:w-2/5 p-5 bg-[#F5F2EA] border border-[#D0C9BA] rounded-xl flex flex-col justify-center items-center space-y-3">
                   <p className="label-mono text-[9px] text-[#7A7468] tracking-widest font-bold uppercase">
                     SYSTEM ARCHITECTURE PIPELINE
                   </p>
 
                   <div className="w-full space-y-2 text-center">
-                    {proj.architecture.map((step, idx) => (
+                    {proj.pipeline.map((step, idx) => (
                       <div key={idx} className="flex flex-col items-center">
                         <div className="w-full py-1.5 bg-[#FFFFFF] border border-[#D0C9BA] rounded text-xs font-bold text-[#1A1612] shadow-2xs font-mono">
                           {step}
                         </div>
-                        {idx < proj.architecture.length - 1 && (
+                        {idx < proj.pipeline.length - 1 && (
                           <span className="text-xs text-[#4A7A3A] py-0.5">↓</span>
                         )}
                       </div>

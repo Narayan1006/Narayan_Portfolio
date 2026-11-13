@@ -16,6 +16,7 @@ export default function RecruiterNav({ onNavigateBack }) {
     { name: 'PROFILE', href: '#profile' },
     { name: 'EXPERIENCE', href: '#experience' },
     { name: 'PROJECTS', href: '#projects' },
+    { name: 'DSA', href: '#dsa' },
     { name: 'SKILLS', href: '#skills' },
     { name: 'EDUCATION', href: '#education' },
     { name: 'CONTACT', href: '#contact' },
@@ -23,10 +24,8 @@ export default function RecruiterNav({ onNavigateBack }) {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-[#EBE7DF]/90 backdrop-blur-md border-b border-[#D0C9BA] py-3.5 shadow-sm'
-          : 'bg-transparent py-6'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#EBE7DF]/95 backdrop-blur-md border-b border-[#D0C9BA] shadow-xs ${
+        scrolled ? 'py-3' : 'py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-between">

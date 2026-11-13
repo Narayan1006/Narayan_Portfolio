@@ -209,6 +209,17 @@ function CinematicRig({ storyStateRef }) {
   );
 }
 
+function RendererDisposer() {
+  const { gl } = useThree();
+  useEffect(() => {
+    return () => {
+      gl.dispose();
+      gl.forceContextLoss();
+    };
+  }, [gl]);
+  return null;
+}
+
 export default function StoryCanvas({ storyStateRef }) {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
@@ -217,6 +228,7 @@ export default function StoryCanvas({ storyStateRef }) {
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       >
+        <RendererDisposer />
         <CinematicRig storyStateRef={storyStateRef} />
         <Suspense fallback={null}>
           <SculptureMesh storyStateRef={storyStateRef} />

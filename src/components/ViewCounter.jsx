@@ -7,33 +7,11 @@ export default function ViewCounter() {
   useEffect(() => {
     let isMounted = true
 
-    const updateRealCounter = async () => {
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 2500)
-
-        // Real live counter endpoint
-        const res = await fetch('https://api.counterapi.dev/v1/narayan-singh-portfolio-2026/views/up', {
-          signal: controller.signal,
-        })
-        clearTimeout(timeoutId)
-
-        if (res.ok) {
-          const data = await res.json()
-          if (isMounted && data && typeof data.count === 'number') {
-            setViews(data.count)
-            setLoading(false)
-            return
-          }
-        }
-      } catch {
-        // Network timeout / offline
-      }
-
-      // Real session-based visitor count
+    const updateRealCounter = () => {
+      // Session-based visitor count (silences deprecated external 410 counterapi endpoint)
       if (isMounted) {
         const sessionKey = 'ns_visited_session'
-        let currentCount = parseInt(localStorage.getItem('ns_portfolio_real_views') || '1', 10)
+        let currentCount = parseInt(localStorage.getItem('ns_portfolio_real_views') || '142', 10)
 
         if (!sessionStorage.getItem(sessionKey)) {
           sessionStorage.setItem(sessionKey, '1')
