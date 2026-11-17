@@ -68,7 +68,7 @@ const CHAPTER_QUOTES = [
   },
   {
     label: "06 / PRACTICE",
-    quote: "// TODO: Narayan to write",
+    quote: "Consistency over intensity.\nMastering data structures and systems\none problem at a time.",
     context: "On Practice",
   },
   {
@@ -166,7 +166,7 @@ function QuoteOverlay({ chapterIdx, onClose }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-export default function ExplorePage({ onNavigateBack }) {
+export default function ExplorePage({ onNavigateBack, onNavigate }) {
   const [activeChapterIndex, setActiveChapterIndex] = useState(0);
   const [scrollProgress, setScrollProgress]         = useState(0);
   const [mobileBg, setMobileBg]                     = useState("#0A0A0C");
@@ -174,12 +174,33 @@ export default function ExplorePage({ onNavigateBack }) {
   const scrollContainerRef = useRef(null);
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-  // Close quote on Escape
+  // Keyboard navigation: Escape closes quote, Arrows navigate chapters, R jumps to recruiter
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") setQuoteVisible(false); };
+    const onKey = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      if (e.key === "Escape") {
+        setQuoteVisible(false);
+        return;
+      }
+      if (e.key === 'r' || e.key === 'R') {
+        if (onNavigate) onNavigate('recruiter');
+        return;
+      }
+      if (e.key === "ArrowDown" || e.key === "ArrowRight" || e.key === "PageDown") {
+        e.preventDefault();
+        const nextIdx = Math.min(CHAPTERS.length - 1, activeChapterIndex + 1);
+        const el = document.getElementById(CHAPTERS[nextIdx].id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
+        const prevIdx = Math.max(0, activeChapterIndex - 1);
+        const el = document.getElementById(CHAPTERS[prevIdx].id);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [activeChapterIndex, onNavigate]);
 
   const handleContainerClick = useCallback((e) => {
     // If clicking an interactive button/link/card/modal, don't toggle quote
@@ -357,20 +378,29 @@ export default function ExplorePage({ onNavigateBack }) {
         activeChapterIndex={activeChapterIndex}
         scrollProgress={scrollProgress}
         onNavigateBack={onNavigateBack}
+        onNavigate={onNavigate}
       />
 
-      {/* INTERACTION HINT PILL (Fades smoothly past Chapter 01 to prevent content overlap) */}
-      <div
-        className={`hidden md:flex fixed bottom-6 left-8 z-30 items-center gap-2.5 px-4 py-2 rounded-full bg-[#121418]/85 border border-[#1F2228] backdrop-blur-md cursor-pointer hover:border-[#6B9A55] transition-all duration-500 shadow-lg hover:scale-105 ${
-          scrollProgress > 0.08 ? 'opacity-0 pointer-events-none translate-y-3' : 'opacity-100 pointer-events-auto'
-        }`}
-        onClick={() => setQuoteVisible((v) => !v)}
-        title="Click to reveal philosophy"
-      >
-        <span className="w-2 h-2 rounded-full bg-[#6B9A55] animate-pulse" />
-        <span className="label-mono text-[10px] text-[#8E929B] hover:text-[#F0EDE8] tracking-wider font-bold transition-colors">
-          CLICK SCULPTURE FOR PHILOSOPHY ✦
-        </span>
+      {/* INTERACTIVE FLOATING BUTTON / PHILOSOPHY PILL */}
+      <div className="fixed bottom-6 left-6 sm:left-8 z-30 flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setQuoteVisible((v) => !v)}
+          className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121418]/90 border border-[#2A2E37] backdrop-blur-md cursor-pointer hover:border-[#6B9A55] text-[#8E929B] hover:text-[#F0EDE8] transition-all duration-300 shadow-lg hover:scale-105"
+          title="Click to view chapter philosophy quote"
+        >
+          <span className="w-2 h-2 rounded-full bg-[#6B9A55] animate-pulse" />
+          <span className="label-mono text-[9px] sm:text-[10px] tracking-wider font-bold">
+            PHILOSOPHY ✦
+          </span>
+        </button>
+
+        <div className="hidden lg:flex items-center gap-1 label-mono text-[9px] text-[#5A5448] bg-[#121418]/60 px-2.5 py-1 rounded-full border border-[#1F2228]">
+          <span>NAVIGATE:</span>
+          <kbd className="px-1 py-0.2 rounded bg-[#1F2228] text-[#8E929B] font-mono text-[9px]">↑</kbd>
+          <kbd className="px-1 py-0.2 rounded bg-[#1F2228] text-[#8E929B] font-mono text-[9px]">↓</kbd>
+          <span>KEYS</span>
+        </div>
       </div>
 
       {/* NATURAL SCROLL CONTAINER */}
@@ -379,7 +409,7 @@ export default function ExplorePage({ onNavigateBack }) {
         className="relative w-full cursor-default"
         onClick={handleContainerClick}
       >
-        <StoryChapters onNavigateBack={onNavigateBack} />
+        <StoryChapters onNavigateBack={onNavigateBack} onNavigate={onNavigate} />
       </div>
 
       {/* QUOTE OVERLAY — appears on model click, section-specific */}

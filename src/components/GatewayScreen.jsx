@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, Suspense, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useProgress } from '@react-three/drei'
 import CinematicCanvas from './CinematicCanvas'
 import ViewCounter from './ViewCounter'
+import CinematicPreloader from './CinematicPreloader'
 
 export default function GatewayScreen({ onNavigate }) {
   const [hoverState, setHoverState] = useState(null)
@@ -10,6 +12,28 @@ export default function GatewayScreen({ onNavigate }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [destination, setDestination] = useState('')
+  const { progress } = useProgress()
+  const [effectiveProgress, setEffectiveProgress] = useState(10)
+
+  useEffect(() => {
+    if (progress > effectiveProgress) {
+      setEffectiveProgress(progress)
+    }
+  }, [progress, effectiveProgress])
+
+  useEffect(() => {
+    // Graceful ticker so preloader has a satisfying 1-2s intro even on hot cache
+    const interval = setInterval(() => {
+      setEffectiveProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          return 100
+        }
+        return Math.min(100, prev + Math.floor(Math.random() * 18 + 12))
+      })
+    }, 180)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -26,11 +50,18 @@ export default function GatewayScreen({ onNavigate }) {
     setIsLoading(false)
   }, [])
 
+  // Keyboard navigation shortcuts: 1 / E for Explore, 2 / R for Recruiter
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 2500)
-    return () => clearTimeout(timer)
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return
+      if (e.key === '1' || e.key === 'e' || e.key === 'E') {
+        handleNavigateClick('explore')
+      } else if (e.key === '2' || e.key === 'r' || e.key === 'R') {
+        handleNavigateClick('recruiter')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   const handleNavigateClick = (view) => {
@@ -59,51 +90,24 @@ export default function GatewayScreen({ onNavigate }) {
         </Suspense>
       </div>
 
-      {/* MOBILE FALLBACK IMAGE — shown only on < md */}
-      <div className="md:hidden absolute inset-0 z-10 pointer-events-none flex items-end justify-center">
+      {/* MOBILE FALLBACK IMAGE — shown only on < md with artistic scrim */}
+      <div className="md:hidden absolute inset-0 z-10 pointer-events-none flex items-end justify-center overflow-hidden">
         <img
           src="/model_fallback.png"
           alt="Narayan Singh"
-          className="h-[75vh] w-auto object-contain object-bottom select-none"
+          className="h-[65vh] w-auto object-contain object-bottom select-none opacity-30 mix-blend-multiply"
           draggable="false"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#EBE7DF] via-[#EBE7DF]/80 to-transparent" />
       </div>
 
-      {/* LOADING OVERLAY */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            key="loader"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 bg-[#EBE7DF] flex flex-col justify-center items-center px-6 pointer-events-none"
-          >
-            <div className="space-y-4 text-center max-w-xs">
-              <div className="flex items-center justify-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#4A7A3A] animate-pulse" />
-                <span className="label-mono text-[#4A7A3A] tracking-[0.3em] text-[10px]">
-                  NARAYAN SINGH
-                </span>
-              </div>
-              <div className="w-36 h-[2px] bg-[#D4CFC4] mx-auto relative overflow-hidden">
-                <motion.div
-                  className="absolute inset-y-0 left-0 bg-[#4A7A3A]"
-                  initial={{ width: '0%' }}
-                  animate={{ width: '100%' }}
-                  transition={{ duration: 1.2, ease: 'easeInOut' }}
-                />
-              </div>
-              <p className="label-mono text-[#7A7468] text-[9px] tracking-[0.25em] hidden md:block">
-                LOADING 3D ASSETS...
-              </p>
-              <p className="label-mono text-[#7A7468] text-[9px] tracking-[0.25em] md:hidden">
-                WELCOME
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* CINEMATIC PRELOADER */}
+      {isLoading && (
+        <CinematicPreloader
+          progress={effectiveProgress}
+          onComplete={handleModelLoaded}
+        />
+      )}
 
       {/* PAGE TRANSITION */}
       <AnimatePresence>
@@ -131,7 +135,7 @@ export default function GatewayScreen({ onNavigate }) {
       </AnimatePresence>
 
       {/* TOP HEADER */}
-      <header className="relative z-30 flex items-center justify-between px-8 sm:px-14 py-7 pointer-events-none">
+      <header className="relative z-30 flex items-center justify-between px-6 sm:px-14 py-6 pointer-events-none">
         <div className="flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-[#4A7A3A]" />
           <span className="label-mono text-xs tracking-[0.25em] font-bold text-[#1A1612]">
@@ -139,137 +143,117 @@ export default function GatewayScreen({ onNavigate }) {
           </span>
         </div>
 
-        <div className="flex items-center gap-4 pointer-events-auto">
+        <div className="flex items-center gap-3 sm:gap-4 pointer-events-auto">
           <ViewCounter />
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#4A7A3A]" />
-            <span className="label-mono text-[10px] text-[#5A5448] tracking-widest">ONLINE</span>
+          <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFFFFF]/75 border border-[#D4CFC4] shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#4A7A3A] animate-pulse" />
+            <span className="label-mono text-[10px] text-[#4A7A3A] tracking-wider font-bold">AVAILABLE</span>
           </div>
-          <span className="label-mono text-[10px] text-[#7A7468] tracking-widest hidden md:inline">
-            01 / ENTRY
-          </span>
         </div>
       </header>
 
-      {/* MAIN CONTENT & CARDS */}
-      <div className="relative z-20 flex-1 w-full flex flex-col justify-between px-8 sm:px-14 pt-12 pb-6 pointer-events-none">
+      {/* MAIN CONTENT & ENTRY PATHS */}
+      <div className="relative z-20 flex-1 w-full flex flex-col justify-center px-6 sm:px-14 pb-12 pointer-events-none">
         
-        {/* LEFT TYPOGRAPHY */}
-        <div className="space-y-4">
+        <div className="max-w-xl space-y-6">
+          
+          {/* EDITORIAL ROLE LABEL */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="flex items-center gap-3"
+          >
+            <span className="w-6 h-[1.5px] bg-[#4A7A3A]" />
+            <span className="label-mono text-xs text-[#4A7A3A] font-bold tracking-[0.3em]">
+              SOFTWARE ENGINEER · AI / ML
+            </span>
+          </motion.div>
+
+          {/* MAIN STATEMENT */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex items-center gap-3"
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="space-y-3"
           >
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black italic tracking-tight leading-none text-[#1A1612] font-['Space_Grotesk'] whitespace-nowrap">
-              HEY, THERE
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black italic tracking-tight leading-[0.92] text-[#1A1612] font-['Space_Grotesk']">
+              BUILDING<br />INTELLIGENT<br />SYSTEMS.
             </h1>
-            <span className="text-4xl sm:text-5xl lg:text-6xl animate-bounce">👋</span>
+            <p className="text-sm sm:text-base text-[#5A5448] leading-relaxed max-w-md pt-2">
+              Turning complex data, machine learning pipelines, and backend architectures into production software.
+            </p>
           </motion.div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.35 }}
-            className="label-mono text-sm sm:text-base tracking-[0.3em] text-[#5A5448]"
-          >
-            I'M <span className="text-[#4A7A3A] font-bold">NARAYAN SINGH</span>
-          </motion.p>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="label-mono text-[11px] sm:text-xs text-[#7A7468] tracking-[0.3em]"
-          >
-            WELCOME TO MY DIGITAL SPACE
-          </motion.p>
-
-          <div className="w-16 h-[2px] bg-[#4A7A3A]/40 pt-1" />
-
-          {/* CURATED PHILOSOPHY QUOTE */}
+          {/* TWO MINIMALIST, HIGH-END ACTION TILES */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.55 }}
-            className="max-w-md pt-2"
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="pt-4 pointer-events-auto"
           >
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#FFFFFF]/75 backdrop-blur-md border border-[#D4CFC4]/70 border-l-4 border-l-[#4A7A3A] shadow-xs space-y-1.5">
-              <p className="text-xs sm:text-sm font-semibold italic text-[#1A1612] font-['Space_Grotesk'] leading-relaxed">
-                “Ideas become architecture. Architecture becomes product. Product becomes impact.”
-              </p>
-              <p className="label-mono text-[9px] text-[#7A7468] tracking-widest font-bold">
-                — CORE PHILOSOPHY
-              </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg">
+              
+              {/* BUTTON 1: 3D STORY */}
+              <button
+                type="button"
+                onClick={() => handleNavigateClick('explore')}
+                className="group p-5 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] backdrop-blur-md border border-[#D4CFC4] hover:border-[#4A7A3A] rounded-2xl text-left transition-all duration-300 shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between h-28 hover:-translate-y-0.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="label-mono text-[9px] text-[#4A7A3A] font-bold tracking-widest">
+                    01 / STORY MODE
+                  </span>
+                  <span className="text-sm text-[#4A7A3A] group-hover:translate-x-1 transition-transform font-bold">
+                    →
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-[#1A1612] font-['Space_Grotesk'] tracking-wide">
+                    EXPLORE 3D
+                  </h3>
+                  <p className="text-[11px] text-[#7A7468] group-hover:text-[#4A453B] transition-colors mt-0.5">
+                    Interactive engineering journey
+                  </p>
+                </div>
+              </button>
+
+              {/* BUTTON 2: RECRUITER */}
+              <button
+                type="button"
+                onClick={() => handleNavigateClick('recruiter')}
+                className="group p-5 bg-[#FFFFFF]/80 hover:bg-[#FFFFFF] backdrop-blur-md border border-[#D4CFC4] hover:border-[#1A1612] rounded-2xl text-left transition-all duration-300 shadow-2xs hover:shadow-md cursor-pointer flex flex-col justify-between h-28 hover:-translate-y-0.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="label-mono text-[9px] text-[#1A1612] font-bold tracking-widest">
+                    02 / RECRUITER
+                  </span>
+                  <span className="text-sm text-[#1A1612] group-hover:translate-x-1 transition-transform font-bold">
+                    →
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-[#1A1612] font-['Space_Grotesk'] tracking-wide">
+                    VIEW RESUME
+                  </h3>
+                  <p className="text-[11px] text-[#7A7468] group-hover:text-[#4A453B] transition-colors mt-0.5">
+                    Verified stack, DSA & metrics
+                  </p>
+                </div>
+              </button>
+
+            </div>
+
+            {/* KEYBOARD SHORTCUTS HINT */}
+            <div className="pt-3 hidden sm:flex items-center gap-2 label-mono text-[9px] text-[#7A7468]">
+              <span>SHORTCUTS:</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-[#E5E0D5] text-[#1A1612] font-bold border border-[#D0C9BA]">1</kbd>
+              <span>STORY</span>
+              <span>·</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-[#E5E0D5] text-[#1A1612] font-bold border border-[#D0C9BA]">2</kbd>
+              <span>RESUME</span>
             </div>
           </motion.div>
-        </div>
-
-        {/* CARDS CONTAINER */}
-        <div className="w-full flex flex-col items-start pointer-events-auto">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full max-w-xl">
-            
-            {/* CARD 1: VIEW */}
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              onMouseEnter={() => setHoverState('view')}
-              onMouseLeave={() => setHoverState(null)}
-              onClick={() => handleNavigateClick('explore')}
-              className="group text-left cursor-pointer p-5 bg-[#FFFFFF]/70 backdrop-blur-md border border-[#D4CFC4] hover:border-[#4A7A3A] shadow-sm hover:shadow-md transition-all duration-300 rounded-xl w-full"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#4A7A3A] mb-3 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-
-              <h3 className="text-xl font-bold uppercase tracking-wider text-[#1A1612] font-['Space_Grotesk'] mb-1">
-                VIEW
-              </h3>
-              <p className="text-xs text-[#5A5448] group-hover:text-[#1A1612] transition-colors mb-4">
-                Explore my work
-              </p>
-
-              <div className="text-[#4A7A3A] group-hover:translate-x-2 transition-transform duration-300 text-lg">
-                →
-              </div>
-            </motion.button>
-
-            {/* CARD 2: RECRUIT */}
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.7 }}
-              onMouseEnter={() => setHoverState('recruit')}
-              onMouseLeave={() => setHoverState(null)}
-              onClick={() => handleNavigateClick('recruiter')}
-              className="group text-left cursor-pointer p-5 bg-[#FFFFFF]/70 backdrop-blur-md border border-[#D4CFC4] hover:border-[#2B2418] shadow-sm hover:shadow-md transition-all duration-300 rounded-xl w-full"
-            >
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2B2418] mb-3 group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-
-              <h3 className="text-xl font-bold uppercase tracking-wider text-[#1A1612] font-['Space_Grotesk'] mb-1">
-                RECRUIT
-              </h3>
-              <p className="text-xs text-[#5A5448] group-hover:text-[#1A1612] transition-colors mb-4">
-                For recruiters
-              </p>
-
-              <div className="text-[#2B2418] group-hover:translate-x-2 transition-transform duration-300 text-lg">
-                →
-              </div>
-            </motion.button>
-
-          </div>
 
         </div>
 

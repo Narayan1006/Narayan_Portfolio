@@ -615,7 +615,7 @@ function PracticeSection() {
 }
 
 // ─── MAIN COMPONENT ────────────────────────────────────────────────────────────
-export default function StoryChapters({ onNavigateBack }) {
+export default function StoryChapters({ onNavigateBack, onNavigate }) {
   const [selectedCert, setSelectedCert] = useState(null);
 
   useEffect(() => {
@@ -910,6 +910,13 @@ export default function StoryChapters({ onNavigateBack }) {
               <p className="label-mono text-xs text-[#6B9A55] tracking-[0.25em]">COMPUTER SCIENCE • ML & FULL STACK</p>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => (onNavigate ? onNavigate('recruiter') : window.location.assign('/recruiter'))}
+                className="px-6 py-3 bg-[#EBE7DF] hover:bg-[#FFFFFF] text-[#1A1612] label-mono text-xs font-bold rounded-lg transition-all cursor-pointer shadow-lg hover:scale-105"
+              >
+                RECRUITER VIEW & RESUME →
+              </button>
               <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-[#121418] hover:bg-[#1F2228] text-[#F0EDE8] border border-[#1F2228] label-mono text-xs font-bold rounded-lg transition-colors">GITHUB →</a>
               <a href={SOCIAL.linkedin} target="_blank" rel="noopener noreferrer" className="px-6 py-3 bg-[#121418] hover:bg-[#1F2228] text-[#F0EDE8] border border-[#1F2228] label-mono text-xs font-bold rounded-lg transition-colors">LINKEDIN →</a>
               <a href={`mailto:${SOCIAL.email}`} className="px-6 py-3 bg-[#6B9A55] hover:bg-[#4A7A3A] text-white label-mono text-xs font-bold rounded-lg transition-colors shadow-lg shadow-[#6B9A55]/20">EMAIL ME →</a>

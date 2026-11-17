@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, Suspense } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -124,7 +124,9 @@ export default function RecruiterHero() {
         >
           <ambientLight intensity={2.2} color="#F0EDE6" />
           <directionalLight position={[-2, 5, 4]} intensity={4.5} color="#FFFDF8" />
-          <Hero3DModel />
+          <Suspense fallback={null}>
+            <Hero3DModel />
+          </Suspense>
         </Canvas>
       </div>
 

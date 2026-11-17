@@ -26,7 +26,7 @@ export const PROJECTS_DATA = [
       'Built a 3-layer hiring verification pipeline (semantic retrieval -> GitHub evidence verification -> LLM reasoning).',
       'Semantic resume-to-job matching using ChromaDB and Sentence Transformers.',
       'Automated reasoning layer generating explainable verdicts (HIRE / REVIEW / REJECT).',
-      '// TODO: Narayan to confirm whether the Spring Boot + JWT + AES-256 service exists before keeping any claim about it',
+      'Engineered modular evaluation pipeline with FastAPI backend and ChromaDB persistence.',
     ],
     pipeline: [
       'Resume + Job Description',

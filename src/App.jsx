@@ -1,7 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import GatewayScreen from './components/GatewayScreen'
-import RecruiterPage from './pages/RecruiterPage'
-import ExplorePage from './pages/ExplorePage'
+
+const RecruiterPage = lazy(() => import('./pages/RecruiterPage'))
+const ExplorePage = lazy(() => import('./pages/ExplorePage'))
+
+const PageFallback = () => (
+  <div className="fixed inset-0 z-50 bg-[#EBE7DF] flex flex-col justify-center items-center">
+    <div className="w-8 h-8 border-2 border-[#4A7A3A] border-t-transparent rounded-full animate-spin" />
+  </div>
+)
 
 export default function App() {
   const [currentView, setCurrentView] = useState('gateway') // 'gateway' | 'explore' | 'recruiter'
@@ -29,11 +36,25 @@ export default function App() {
   }
 
   if (currentView === 'explore') {
-    return <ExplorePage onNavigateBack={() => handleNavigate('gateway')} />
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <ExplorePage
+          onNavigateBack={() => handleNavigate('gateway')}
+          onNavigate={handleNavigate}
+        />
+      </Suspense>
+    )
   }
 
   if (currentView === 'recruiter') {
-    return <RecruiterPage onNavigateBack={() => handleNavigate('gateway')} />
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <RecruiterPage
+          onNavigateBack={() => handleNavigate('gateway')}
+          onNavigate={handleNavigate}
+        />
+      </Suspense>
+    )
   }
 
   return <GatewayScreen onNavigate={handleNavigate} />

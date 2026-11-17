@@ -20,36 +20,36 @@ export default function EducationSection() {
             ACADEMIC BACKGROUND
           </h3>
 
-          <div className="p-6 bg-[#FFFFFF]/80 backdrop-blur-md border border-[#D0C9BA] rounded-xl space-y-4">
-            <div className="flex justify-between items-start">
+          <div className="p-6 sm:p-7 bg-[#FFFFFF]/85 backdrop-blur-md border border-[#D0C9BA] rounded-2xl space-y-4 shadow-2xs">
+            <div className="flex justify-between items-start gap-4">
               <div>
-                <h4 className="text-xl font-bold text-[#1A1612] font-['Space_Grotesk']">
+                <h4 className="text-xl sm:text-2xl font-bold text-[#1A1612] font-['Space_Grotesk']">
                   {EDUCATION.degree}
                 </h4>
                 <p className="text-sm text-[#4A7A3A] font-semibold mt-1">
                   {EDUCATION.institution} — {EDUCATION.location}
                 </p>
               </div>
-              <span className="label-mono text-xs text-[#7A7468]">
+              <span className="label-mono text-xs text-[#5A5448] font-semibold px-2.5 py-1 bg-[#E5E0D5] rounded-md shrink-0">
                 {EDUCATION.period}
               </span>
             </div>
 
             {EDUCATION.cgpa && (
-              <p className="label-mono text-xs text-[#1A1612] font-bold">
-                CGPA: <span className="text-[#4A7A3A]">{EDUCATION.cgpa}</span>
+              <p className="label-mono text-xs text-[#1A1612] font-bold pt-1">
+                CGPA: <span className="text-[#4A7A3A] text-sm font-black">{EDUCATION.cgpa}</span>
               </p>
             )}
 
             <div className="pt-3 border-t border-[#D0C9BA]/60">
-              <p className="label-mono text-[10px] text-[#7A7468] tracking-widest mb-2 font-bold uppercase">
+              <p className="label-mono text-[10px] text-[#5A5448] tracking-widest mb-2 font-bold uppercase">
                 RELEVANT COURSEWORK
               </p>
               <div className="flex flex-wrap gap-2">
                 {EDUCATION.coursework.map((course, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 bg-[#F5F2EA] text-[#3D372E] text-xs font-medium rounded border border-[#E0D9CB]"
+                    className="px-2.5 py-1 bg-[#F5F2EA] text-[#3D372E] text-xs font-medium rounded-lg border border-[#E0D9CB]"
                   >
                     {course}
                   </span>
@@ -72,13 +72,13 @@ export default function EducationSection() {
               {CERTIFICATIONS.map((cert, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-[#FFFFFF]/70 backdrop-blur-sm border border-[#D0C9BA] rounded-lg flex items-center justify-between"
+                  className="p-4 bg-[#FFFFFF]/85 backdrop-blur-sm border border-[#D0C9BA] rounded-xl flex items-center justify-between hover:border-[#4A7A3A] transition-all shadow-2xs"
                 >
                   <div>
-                    <h5 className="text-xs font-bold text-[#1A1612]">
+                    <h5 className="text-xs sm:text-sm font-bold text-[#1A1612]">
                       {cert.name}
                     </h5>
-                    <p className="text-[11px] text-[#7A7468]">
+                    <p className="text-[11px] text-[#5A5448] mt-0.5">
                       {cert.issuer} {cert.year ? `· ${cert.year}` : ''}
                     </p>
                   </div>
@@ -88,12 +88,12 @@ export default function EducationSection() {
                       href={cert.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="label-mono text-[10px] text-[#4A7A3A] font-bold hover:underline"
+                      className="label-mono text-[10px] text-[#4A7A3A] font-bold hover:underline px-2.5 py-1 rounded bg-[#E8F0E4]"
                     >
                       VERIFY →
                     </a>
                   ) : (
-                    <span className="label-mono text-[9px] text-[#A6A092]">VERIFIED</span>
+                    <span className="label-mono text-[9px] text-[#5A5448] px-2 py-0.5 rounded bg-[#E5E0D5]">VERIFIED</span>
                   )}
                 </div>
               ))}
@@ -110,17 +110,17 @@ export default function EducationSection() {
               {ACHIEVEMENTS.map((ach, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-[#FFFFFF]/70 backdrop-blur-sm border border-[#D0C9BA] rounded-lg"
+                  className="p-4 bg-[#FFFFFF]/85 backdrop-blur-sm border border-[#D0C9BA] rounded-xl shadow-2xs"
                 >
                   <div className="flex items-center justify-between">
-                    <h5 className="text-xs font-bold text-[#1A1612]">
+                    <h5 className="text-xs sm:text-sm font-bold text-[#1A1612]">
                       {ach.title}
                     </h5>
                     <span className="px-2 py-0.5 bg-[#E5E0D5] text-[#4A7A3A] label-mono text-[9px] font-bold rounded">
                       {ach.category}
                     </span>
                   </div>
-                  <p className="text-xs text-[#5A5448] mt-1">
+                  <p className="text-xs text-[#4A453B] mt-1.5 leading-relaxed">
                     {ach.description}
                   </p>
                 </div>

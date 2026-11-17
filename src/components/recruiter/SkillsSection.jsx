@@ -13,21 +13,26 @@ export default function SkillsSection() {
       </div>
 
       {/* CATEGORIZED SKILLS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {Object.entries(SKILLS).map(([category, items]) => (
           <div
             key={category}
-            className="p-5 bg-[#FFFFFF]/70 backdrop-blur-md border border-[#D0C9BA] rounded-xl space-y-3"
+            className="p-6 bg-[#FFFFFF]/85 backdrop-blur-md border border-[#D0C9BA] rounded-2xl space-y-3.5 shadow-2xs hover:border-[#4A7A3A] transition-all"
           >
-            <h3 className="label-mono text-xs font-bold text-[#4A7A3A] tracking-widest border-b border-[#D0C9BA]/60 pb-2">
-              {category}
-            </h3>
+            <div className="flex items-center justify-between border-b border-[#D0C9BA]/60 pb-2.5">
+              <h3 className="label-mono text-xs font-bold text-[#4A7A3A] tracking-widest">
+                {category}
+              </h3>
+              <span className="label-mono text-[9px] text-[#5A5448] font-bold">
+                {items.length} TECHNOLOGIES
+              </span>
+            </div>
 
             <div className="flex flex-wrap gap-2 pt-1">
               {items.map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-[#F5F2EA] border border-[#E0D9CB] text-[#1A1612] text-xs font-semibold rounded-md"
+                  className="px-3 py-1 bg-[#F5F2EA] border border-[#E0D9CB] text-[#1A1612] text-xs font-semibold rounded-lg hover:border-[#4A7A3A] transition-colors"
                 >
                   {skill}
                 </span>

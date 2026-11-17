@@ -1,6 +1,15 @@
+import { useState } from 'react'
 import { PROFILE } from '../../data/recruiterData'
 
 export default function ContactSection() {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(PROFILE.email)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <section id="contact" className="py-20 border-t border-[#D0C9BA]/60">
       
@@ -26,6 +35,14 @@ export default function ContactSection() {
           >
             EMAIL ME →
           </a>
+
+          <button
+            type="button"
+            onClick={handleCopyEmail}
+            className="px-6 py-3 bg-[#E5E0D5] hover:bg-[#D0C9BA] text-[#1A1612] label-mono text-xs font-bold rounded-lg transition-all duration-200 cursor-pointer"
+          >
+            {copied ? 'COPIED! ✓' : 'COPY EMAIL'}
+          </button>
 
           <a
             href={PROFILE.linkedin}
@@ -56,9 +73,25 @@ export default function ContactSection() {
         </div>
 
         {/* DIRECT CONTACT STRIP */}
-        <div className="pt-6 border-t border-[#D0C9BA]/60 flex flex-wrap items-center justify-center gap-6 text-xs text-[#7A7468] label-mono">
-          <div>DIRECT EMAIL: <span className="text-[#1A1612] font-bold">{PROFILE.email}</span></div>
-          <div>PHONE: <span className="text-[#1A1612] font-bold">{PROFILE.phone}</span></div>
+        <div className="pt-6 border-t border-[#D0C9BA]/60 flex flex-wrap items-center justify-center gap-6 text-xs text-[#5A5448] label-mono">
+          <div>
+            DIRECT EMAIL:{' '}
+            <a
+              href={`mailto:${PROFILE.email}`}
+              className="text-[#1A1612] font-bold hover:text-[#4A7A3A] transition-colors underline decoration-[#D0C9BA] underline-offset-4"
+            >
+              {PROFILE.email}
+            </a>
+          </div>
+          <div>
+            PHONE:{' '}
+            <a
+              href={`tel:${PROFILE.phone}`}
+              className="text-[#1A1612] font-bold hover:text-[#4A7A3A] transition-colors underline decoration-[#D0C9BA] underline-offset-4"
+            >
+              {PROFILE.phone}
+            </a>
+          </div>
         </div>
 
       </div>
